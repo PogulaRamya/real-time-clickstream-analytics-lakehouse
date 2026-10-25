@@ -1,6 +1,6 @@
 # Validation report
 
-Validated on 2026-10-25. All four [GitHub Actions jobs](https://github.com/PogulaRamya/Project/actions/runs/40180013090) passed on implementation commit `c0d28f960f762c682240944ad0683a0b4825fb6e`. The following documentation-only update does not alter tested code:
+Validated on 2026-10-25. All four [GitHub Actions jobs](https://github.com/PogulaRamya/real-time-clickstream-analytics-lakehouse/actions/runs/40180013090) passed on implementation commit `c0d28f960f762c682240944ad0683a0b4825fb6e`. The following documentation-only update does not alter tested code:
 
 | Check | Result |
 |---|---|
