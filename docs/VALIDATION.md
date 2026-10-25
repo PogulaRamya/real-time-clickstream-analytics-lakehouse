@@ -1,6 +1,6 @@
 # Validation report
 
-Validated locally on 2026-10-25:
+Validated on 2026-10-25. All four [GitHub Actions jobs](https://github.com/PogulaRamya/Project/actions/runs/40180013090) passed on implementation commit `c0d28f960f762c682240944ad0683a0b4825fb6e`. The following documentation-only update does not alter tested code:
 
 | Check | Result |
 |---|---|
@@ -13,8 +13,9 @@ Validated locally on 2026-10-25:
 | Python files | Compilation passed |
 | YAML / Tableau XML / Terraform HCL | Parsed successfully |
 | Terraform formatting | Passed `terraform fmt -check` |
-| Terraform provider validation | Blocked locally: downloaded AWS provider failed plugin handshake in this host; rerun `terraform init` and `terraform validate` in CI/deployment environment |
+| Terraform provider validation | Passed in GitHub Actions. Local host could not start the AWS provider, but the GitHub runner initialized and validated it successfully. |
 
 Not verified: live Kinesis ingestion, streaming watermark state eviction/restarts, Unity Catalog grants/masks/lineage behavior, Snowflake export transactions, dbt execution against Snowflake, Airflow scheduling, Tableau Desktop opening/publication, 5K events/sec throughput or cost.
 
 CI checks Python/demo, Scala compilation and gold smoke test, dbt parsing, and Terraform provider validation. A green offline CI result still does not prove cloud end-to-end correctness. Follow OPERATIONS.md before making any production or performance claims.
+
