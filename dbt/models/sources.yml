@@ -1,0 +1,14 @@
+version: 2
+sources:
+  - name: raw
+    database: CLICKSTREAM
+    schema: RAW
+    tables:
+      - name: product_minute
+        description: Provisional one-minute product metrics updated from Delta CDF.
+        loaded_at_field: updated_at
+        freshness:
+          warn_after: {count: 10, period: minute}
+          error_after: {count: 30, period: minute}
+      - name: sessions
+        description: Finalized inactivity sessions; no raw user identifier is exported.

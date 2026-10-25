@@ -1,0 +1,82 @@
+bundle:
+  name: clickstream-lakehouse
+variables:
+  catalog:
+    default: clickstream_dev
+  cluster_id:
+    description: Dedicated UC cluster, DBR 15.4 LTS, instance profile with Kinesis read policy
+  checkpoint_root:
+    description: Durable checkpoint path, e.g. /Volumes/clickstream_dev/ops/checkpoints
+  stream_name:
+    default: clickstream-dev
+  region:
+    default: us-east-1
+  sf_account:
+    description: Snowflake organization-account identifier
+  sf_database:
+    default: CLICKSTREAM
+  sf_warehouse:
+    default: CLICKSTREAM_WH
+  sf_role:
+    default: CLICKSTREAM_LOADER
+  secret_scope:
+    default: clickstream
+resources:
+  jobs:
+    bronze:
+      name: clickstream-bronze
+      max_concurrent_runs: 1
+      tasks:
+        - task_key: ingest
+          existing_cluster_id: ${var.cluster_id}
+          notebook_task:
+            notebook_path: ./databricks/notebooks/01_bronze.scala
+            base_parameters:
+              catalog: ${var.catalog}
+              stream_name: ${var.stream_name}
+              region: ${var.region}
+              checkpoint_root: ${var.checkpoint_root}
+    silver:
+      name: clickstream-silver
+      max_concurrent_runs: 1
+      tasks:
+        - task_key: clean
+          existing_cluster_id: ${var.cluster_id}
+          notebook_task:
+            notebook_path: ./databricks/notebooks/02_silver.scala
+            base_parameters:
+              catalog: ${var.catalog}
+              checkpoint_root: ${var.checkpoint_root}
+    gold:
+      name: clickstream-gold
+      max_concurrent_runs: 1
+      tasks:
+        - task_key: aggregate
+          existing_cluster_id: ${var.cluster_id}
+          notebook_task:
+            notebook_path: ./databricks/notebooks/03_gold.scala
+            base_parameters:
+              catalog: ${var.catalog}
+              checkpoint_root: ${var.checkpoint_root}
+    export:
+      name: clickstream-export
+      max_concurrent_runs: 1
+      tasks:
+        - task_key: export
+          existing_cluster_id: ${var.cluster_id}
+          libraries:
+            - pypi:
+                package: snowflake-connector-python>=3.12,<4
+          notebook_task:
+            notebook_path: ./databricks/notebooks/04_export.py
+            base_parameters:
+              catalog: ${var.catalog}
+              sf_account: ${var.sf_account}
+              sf_database: ${var.sf_database}
+              sf_warehouse: ${var.sf_warehouse}
+              sf_role: ${var.sf_role}
+              secret_scope: ${var.secret_scope}
+targets:
+  dev:
+    default: true
+    mode: development

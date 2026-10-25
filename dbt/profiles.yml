@@ -1,0 +1,14 @@
+clickstream:
+  target: dev
+  outputs:
+    dev:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
+      user: "{{ env_var('SNOWFLAKE_USER') }}"
+      private_key_path: "{{ env_var('SNOWFLAKE_PRIVATE_KEY_PATH') }}"
+      role: CLICKSTREAM_TRANSFORMER
+      database: CLICKSTREAM
+      warehouse: CLICKSTREAM_WH
+      schema: ANALYTICS
+      threads: 4
+      client_session_keep_alive: false

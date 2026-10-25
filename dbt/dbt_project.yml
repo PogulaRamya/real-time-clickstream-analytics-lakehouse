@@ -1,0 +1,11 @@
+name: clickstream
+version: '1.0.0'
+config-version: 2
+profile: clickstream
+model-paths: [models]
+snapshot-paths: [snapshots]
+seed-paths: [seeds]
+test-paths: [tests]
+models:
+  clickstream:
+    +materialized: view

@@ -1,0 +1,16 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+*.pem
+*.p8
+.terraform/
+*.tfstate*
+*.tfvars
+!*.tfvars.example
+dbt/target/
+dbt/logs/
+build/
+.databricks/
+dbt/.user.yml
+*.plan

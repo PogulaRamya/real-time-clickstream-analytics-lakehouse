@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Synthetic clickstream event v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "event_id",
+    "event_time",
+    "user_id",
+    "event_type",
+    "product_id",
+    "quantity",
+    "revenue_cents",
+    "currency"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "event_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "event_time": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "user_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "email": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "event_type": {
+      "enum": [
+        "page_view",
+        "product_view",
+        "add_to_cart",
+        "checkout",
+        "purchase"
+      ]
+    },
+    "product_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "order_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "quantity": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "revenue_cents": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "currency": {
+      "const": "USD"
+    },
+    "device": {
+      "type": "string"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "event_type": {
+            "const": "purchase"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "order_id"
+        ],
+        "properties": {
+          "order_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "quantity": {
+            "minimum": 1
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "quantity": {
+            "const": 0
+          },
+          "revenue_cents": {
+            "const": 0
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+name: CI
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m unittest discover -s tests -v
+      - run: python -m clickstream.demo
+      - run: python -m compileall -q clickstream airflow databricks/notebooks
+      - uses: actions/upload-artifact@v4
+        with:
+          name: local-demo
+          path: build/
+  dbt-parse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install dbt-core==1.9.1 dbt-snowflake==1.9.1
+      - run: dbt parse --project-dir dbt --profiles-dir dbt --no-partial-parse
+        env:
+          SNOWFLAKE_ACCOUNT: placeholder
+          SNOWFLAKE_USER: placeholder
+          SNOWFLAKE_PRIVATE_KEY_PATH: /tmp/not-used-by-parse.p8
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.8
+      - run: terraform -chdir=infra fmt -check
+      - run: terraform -chdir=infra init -backend=false
+      - run: terraform -chdir=infra validate
+  scala-compile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - run: pip install pyspark==3.5.3
+      - run: curl --fail --location --retry 3 -o /tmp/delta.jar https://repo.maven.apache.org/maven2/io/delta/delta-spark_2.12/3.2.0/delta-spark_2.12-3.2.0.jar
+      - run: python scripts/check_scala.py /tmp/delta.jar
+      - run: python scripts/spark_smoke.py
